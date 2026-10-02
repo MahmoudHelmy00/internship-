@@ -1,0 +1,191 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Employee Dashboard</h2>
+            <p class="text-muted mb-0">
+                Overview of employee activity throughout the day
+            </p>
+        </div>
+
+        <a asp-page="/employees/list" class="btn btn-primary">
+            Manage Employees
+        </a>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Employees</p>
+                    <h3 id="totalEmployees">--</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Currently Scheduled</p>
+                    <h3 id="currentlyActive">--</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Hours Tracked</p>
+                    <h3>24</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <h5 class="card-title">
+                Employee Activity by Hour
+            </h5>
+
+            <p class="text-muted">
+                Number of employees scheduled to be active at the beginning
+                of each hour
+            </p>
+
+            <div style="position: relative; height: 400px;">
+                <canvas id="employeeActivityChart"></canvas>
+            </div>
+
+            <div id="chartError" class="text-danger mt-3"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            let activityChart = null;
+
+            $.ajax({
+                url: '@Url.Page("/Index", "EmployeeActivity")',
+                type: 'GET',
+                dataType: 'json',
+
+                success: function (data) {
+
+                    const labels = data.map(item => item.hour);
+                    const counts = data.map(item => item.count);
+
+                    // Total employees scheduled at any hour
+                    const totalEmployees = Math.max(...counts);
+
+                    // Get current hour on the user's local clock
+                    const currentHour = new Date().getHours();
+
+                    // Number scheduled at the current hour
+                    const currentlyActive = counts[currentHour];
+
+                    $('#totalEmployees').text(totalEmployees);
+                    $('#currentlyActive').text(currentlyActive);
+
+                    const ctx = document
+                        .getElementById('employeeActivityChart')
+                        .getContext('2d');
+
+                    activityChart = new Chart(ctx, {
+                        type: 'line',
+
+                        data: {
+                            labels: labels,
+
+                            datasets: [{
+                                label: 'Active Employees',
+                                data: counts,
+                                borderWidth: 3,
+                                tension: 0.3,
+                                fill: true,
+                                pointRadius: 3,
+                                pointHoverRadius: 6
+                            }]
+                        },
+
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+
+                            interaction: {
+                                intersect: false,
+                                mode: 'index'
+                            },
+
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                },
+
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            return 'Active employees: ' +
+                                                context.parsed.y;
+                                        }
+                                    }
+                                }
+                            },
+
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Hour of the Day'
+                                    }
+                                },
+
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        precision: 0
+                                    },
+
+                                    title: {
+                                        display: true,
+                                        text: 'Number of Employees'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+
+                error: function (xhr) {
+                    console.error(
+                        'Failed to load employee activity:',
+                        xhr.responseText
+                    );
+
+                    $('#chartError').text(
+                        'Could not load employee activity. ' +
+                        'Check the browser console and server logs.'
+                    );
+
+                    $('#totalEmployees').text('Error');
+                    $('#currentlyActive').text('Error');
+                }
+            });
+        });
+    </script>
+}

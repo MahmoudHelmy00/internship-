@@ -1,0 +1,746 @@
+﻿@page
+@model Razor2web.Pages.employees.listModel
+@{
+}
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" id="load">add employee </button>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="employeeForm">
+                    <div class="mb-3">
+                        <label>Full Name</label>
+                        <input type="text" class="form-control" id="fullname" name="e.Name" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Gender</label>
+                        <input type="radio" name="e.gender" value="male" id="male" /><label for="male">Male</label>
+                        <input type="radio" name="e.gender" value="female" id="female" /><label for="female">Female</label>
+                    </div>
+
+                    <label for="jobSelect">Job</label>
+
+                    <select id="jobSelect" class="form-control"  name="e.gob_description"  required>
+                        <option value="">Select a job</option>
+                    </select>
+
+
+                    <div class="mb-3">
+                        <label>Department</label>
+                        <input type="text" class="form-control" name="e.department" id="department" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Start Work At</label>
+                        <input type="time" class="form-control" name="e.startShift" id="startShift" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>End Work At</label>
+                        <input type="time" class="form-control" name="e.endShift" id="endShift" required />
+                    </div>
+
+                    <button type="submit" id="save" class="btn btn-primary" name="save">Save</button>
+                
+                </div>
+                <div id="message"></div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<table class="table table-striped" id="example">
+       <thead>
+          <tr>
+                   <th>id </th>
+                   <th>department</th>
+                   <th>gender</th>
+                   <th>name</th>
+                   <th>startShift</th>
+                   <th>endShift</th>
+                   <th> edit</th>
+                   <th> delete</th>
+               </tr>
+       </thead>
+        <tbody id="employee-table-body">
+           
+           
+            
+        </tbody>
+   </table>
+<div class="modal fade" id="exampleModalUpdate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="employeeForm">
+                    <div class="mb-3">
+                        <label>Full Name</label>
+                        <input type="text" class="form-control" id="Fullname" name="e.Name" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Gender</label>
+                        <input type="radio" name="e.newGender" value="male" id="Male" /><label for="male">Male</label>
+                        <input type="radio" name="e.newGender" value="female" id="Female" /><label for="female">Female</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Job Description</label>
+                        <input type="text" class="form-control" name="e.gob_description" id="Gob_description" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Department</label>
+                        <input type="text" class="form-control" name="e.department" id="Department" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Start Work At</label>
+                        <input type="time" class="form-control" name="e.startShift" id="newStartShift" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label>End Work At</label>
+                        <input type="time" class="form-control" name="e.endShift" id="newEndShift" required />
+                    </div>
+
+                    <button type="submit" id="update" class="btn btn-primary" name="save">update</button>
+               </div>
+
+                <div id="message"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+    <script>
+    //     $(document).ready(function () {
+
+    //         var employeeData = {}; In-memory storage for employee data
+    //         var datatable = $('#example').DataTable();
+    //         Fetch employees and populate the table
+    //         $.ajax({
+    //             url: '@Url.Page("/employees/list", "EmployeesJson")', Adjust the URL as per your route
+    //             type: 'GET',
+    //             success: function (employees) {
+    //                 var tableBody = $('#employee-table-body');
+    //                 tableBody.empty(); Clear any existing rows
+    //                 tableBody.append(
+    //                     '<tr>' +
+    //                     '<th>' + 'id' + '</th>' +
+    //                     '<th>' + 'department' + '</th>' +
+    //                     '<th>' + 'gender' + '</th>' +
+    //                     '<th>' + 'name' + '</th>' +
+    //                     '<th>' + 'startShift' + '</th>' +
+    //                     '<th>' +' endShift' + '</th>'+
+    //                     '<th>' + ' edit' + '</th>' +
+    //                     '<th>' + ' delete' + '</th>' +'</tr>'
+    //                 );
+    //                 Loop through employees and populate table + in-memory employeeData
+    //                 $.each(employees, function (index, employee) {
+    //                     employeeData[employee.id] = employee; Store employee data with the id as the key
+
+    //                     tableBody.append('<tr>' +
+    //                         '<td>' + employee.id + '</td>' +
+    //                         '<td>' + employee.department + '</td>' +
+    //                         '<td>' + employee.gender + '</td>' +
+    //                         '<td>' + employee.name + '</td>' +
+    //                         '<td>' + employee.startShift + '</td>' +
+    //                         '<td>' + employee.endShift + '</td>' +
+    //                         '<td><button type="button" class="btn btn-primary edit-btn" data-toggle="modal" data-id="' + employee.id + '" data-target="#exampleModalUpdate">Edit</button></td>' +
+    //                         '<td><button class="btn btn-danger delete-btn" data-id="' + employee.id + '">Delete</button></td>' +
+    //                         '</tr>');
+    //                 });
+
+    //                 Edit button functionality
+    //                 datatable.clear();
+    //                 $.each(employees, function (index, item) {
+    //                     datatable.row.add([
+    //                         item.id,
+    //                         item.department,
+    //                         item.gender,
+    //                         item.name,
+    //                         item.startShift,
+    //                         item.endShift,
+    //                         `<button type="button" class="btn btn-primary edit-btn" data-toggle="modal" data-id="${item.id}" data-name="${item.name}" data-department="${item.department}"
+    //                                                                 data-gender="${item.gender}"  data-endShift="${item.endShift}" data-startShift="${item.startShift}" data-gob_description="${item.gob_description}" data-target="#exampleModalUpdate">Edit</button></td>`,
+    //                         `<button class="btn btn-danger delete-btn" data-id="${item.id}">Delete</button>`
+    //                     ]);
+
+    //                 });
+    //                 datatable.draw();
+    //             },
+    //             error: function () {
+    //                 alert('Error fetching employee data');
+    //             }
+    //         });
+
+
+
+    //         var id;
+
+    //         $("#example").on('click', '.edit-btn', function () {
+    //             id = $(this).data('id'); Get the employee ID from the clicked button
+    //             var name = $(this).data('name');
+    //             var department = $(this).data('department');
+    //             var gender = $(this).data('gender');
+    //             var startShift = $(this).data('startshift');
+    //             var endShift = $(this).data('endshift');
+    //             var gob_description = $(this).data('gob_description');
+    //             $('#Fullname').val(name);
+    //             $('#Department').val(department);
+    //             $('input[name="e.newGender"][value="' + gender + '"]').prop('checked', true);
+    //             $('#Gob_description').val(gob_description);
+    //             $('#newStartShift').val(startShift);
+    //             $('#newEndShift').val(endShift);
+
+
+    //         });
+
+    //         $("#example").on('click', '.delete-btn', function () {
+               
+    //                 var id = $(this).data('id'); Get the employee ID from the clicked button
+
+    //                 if (confirm("Are you sure you want to delete this employee?")) {
+    //                     $.ajax({
+    //                         url: '?handler=Delete', Adjust to match your backend handler
+    //                         method: 'POST',
+    //                         contentType: 'application/json',
+    //                         data: JSON.stringify(id), Send the employee ID as the payload
+    //                         success: function (response) {
+    //                             if (response.success) {
+    //                                 $('#message').text('Employee has been deleted successfully').css('color', 'green');
+    //                                 window.location.href = '/employees/list'; Redirect after successful deletion
+    //                             } else {
+    //                                 $('#message').text('Failed to delete employee').css('color', 'red');
+    //                             }
+    //                         },
+    //                         error: function (xhr, status, error) {
+    //                             $('#message').text('An error occurred: ' + error).css('color', 'red');
+    //                         }
+    //                     });
+    //                 }
+                
+                
+    //          });
+
+
+
+
+
+
+
+    //     $("#update").click(function (event) {
+    //         event.preventDefault();
+            
+             
+
+    //         var updatedData = {
+    //             Id: id,
+    //             Name: $('#Fullname').val(),
+    //             gender: $('input[name="e.newGender"]:checked').val(),
+    //             department: $('#Department').val(),
+    //             gob_description: $('#Gob_description').val(),
+    //             startShift: $('#newStartShift').val(),
+    //             endShift: $('#newEndShift').val()
+    //         };
+
+    //         $.ajax({
+    //             url: '?handler=Update', Update handler URL
+    //             method: 'POST',
+    //             contentType: 'application/json',
+    //             data: JSON.stringify(updatedData),
+    //             success: function (response) {
+    //                 console.log(updatedData);
+    //                 if (response.success) {
+    //                     console.log(updatedData);
+    //                     $('#message').text('Employee updated successfully').css('color', 'green');
+    //                     window.location.href = '/employees/list'; Redirect after update
+    //                 } else {
+    //                     $('#message').text('Failed to update employee').css('color', 'red');
+    //                 }
+    //             },
+    //             error: function (xhr, status, error) {
+    //                 $('#message').text('An error occurred: ' + error).css('color', 'red');
+    //             }
+    //         });
+    //     });
+    // });
+    //     $('#save').click(function () {
+    //         var datatosend =
+    //         {
+    //             Name: $('#fullname').val(),
+    //             gender: $('input[name="e.gender"]:checked').val(),
+    //             department: $('#department').val(),
+    //             startShift: $('#startShift').val(),
+    //              JobId: parseInt($('#jobSelect').val()),
+    //             endShift: $('#endShift').val()
+    //         };
+    //         $.ajax({
+    //             url: '?handler=Employee',
+    //             method: 'POST',
+    //             contentType: 'application/json',
+    //             data: JSON.stringify(datatosend),
+    //             success: function (response) {
+
+    //                 if (response.success) {
+    //                     $('#message').text('Employee has been created successfully').css('color', 'green');
+    //                     window.location.href = '/employees/list';
+    //                 } else {
+    //                     $('#message').text('Failed to create employee').css('color', 'red');
+    //                 }
+    //             },
+    //             error: function (xhr, status, error) {
+    //                 $('#message').text('An error occurred: ' + error).css('color', 'red');
+    //             }
+    //         });
+    
+    //     });
+        
+    //     $('#exampleModal').on('shown.bs.modal', function () {
+    //     loadJobs();
+      
+
+    //          function loadJobs() {
+                   
+   
+    //      $.ajax({
+    //         url: '?handler=JobResult',
+    //         type: 'GET',
+
+    //         success: function (jobs) {
+    //             var jobSelect = $('#jobSelect');
+
+    //             jobSelect.empty();
+
+    //             jobSelect.append(
+    //                 '<option value="">Select a job</option>'
+    //             );
+
+    //             $.each(jobs, function (index, job) {
+    //                 jobSelect.append(
+    //                     '<option value="' + job.id + '">' +
+    //                     job.name +
+    //                     '</option>'
+    //                 );
+    //             });
+    //         },
+
+    //         error: function () {
+    //             alert('Error loading jobs');
+    //         }
+    //      }); 
+    //                              });
+    // }
+
+
+
+    $(document).ready(function () {
+
+        // =========================================================
+        // 1. INITIALIZE DATATABLE
+        // =========================================================
+
+        var datatable = $('#example').DataTable();
+
+
+        // =========================================================
+        // 2. LOAD EMPLOYEES
+        // =========================================================
+
+        $.ajax({
+            url: '@Url.Page("/employees/list", "EmployeesJson")',
+            type: 'GET',
+
+            success: function (employees) {
+
+                datatable.clear();
+
+                $.each(employees, function (index, item) {
+
+                    datatable.row.add([
+                        item.id,
+                        item.department,
+                        item.gender,
+                        item.name,
+                        item.startShift,
+                        item.endShift,
+
+                        // Edit button
+                        `<button type="button"
+                            class="btn btn-primary edit-btn"
+                            data-toggle="modal"
+                            data-id="${item.id}"
+                            data-name="${item.name}"
+                            data-department="${item.department}"
+                            data-gender="${item.gender}"
+                            data-endShift="${item.endShift}"
+                            data-startShift="${item.startShift}"
+                            data-gob_description="${item.gob_description}"
+                            data-target="#exampleModalUpdate">
+                            Edit
+                        </button>`,
+
+                        // Delete button
+                        `<button
+                            type="button"
+                            class="btn btn-danger delete-btn"
+                            data-id="${item.id}">
+                            Delete
+                        </button>`
+                    ]);
+
+                });
+
+                datatable.draw();
+            },
+
+            error: function () {
+                alert('Error fetching employee data');
+            }
+        });
+
+
+        // =========================================================
+        // 3. VARIABLE FOR EMPLOYEE ID
+        // =========================================================
+
+        var id;
+
+
+        // =========================================================
+        // 4. EDIT BUTTON
+        // =========================================================
+
+        $("#example").on('click', '.edit-btn', function () {
+
+            id = $(this).data('id');
+
+            var name = $(this).data('name');
+            var department = $(this).data('department');
+            var gender = $(this).data('gender');
+            var startShift = $(this).data('startshift');
+            var endShift = $(this).data('endshift');
+            var gob_description = $(this).data('gob_description');
+
+
+            $('#Fullname').val(name);
+
+            $('#Department').val(department);
+
+            $('input[name="e.newGender"][value="' + gender + '"]')
+                .prop('checked', true);
+
+            $('#Gob_description').val(gob_description);
+
+            $('#newStartShift').val(startShift);
+
+            $('#newEndShift').val(endShift);
+
+        });
+
+
+        // =========================================================
+        // 5. DELETE EMPLOYEE
+        // =========================================================
+
+        $("#example").on('click', '.delete-btn', function () {
+
+            var deleteId = $(this).data('id');
+
+            if (confirm("Are you sure you want to delete this employee?")) {
+
+                $.ajax({
+
+                    url: '?handler=Delete',
+
+                    method: 'POST',
+
+                    contentType: 'application/json',
+
+                    data: JSON.stringify(deleteId),
+
+                    success: function (response) {
+
+                        if (response.success) {
+
+                            $('#message')
+                                .text('Employee has been deleted successfully')
+                                .css('color', 'green');
+
+                            window.location.href = '/employees/list';
+
+                        } else {
+
+                            $('#message')
+                                .text('Failed to delete employee')
+                                .css('color', 'red');
+                        }
+                    },
+
+                    error: function (xhr, status, error) {
+
+                        console.log(xhr.responseText);
+
+                        $('#message')
+                            .text('An error occurred: ' + error)
+                            .css('color', 'red');
+                    }
+                });
+            }
+        });
+
+
+        // =========================================================
+        // 6. UPDATE EMPLOYEE
+        // =========================================================
+
+        $("#update").click(function (event) {
+
+            event.preventDefault();
+
+
+            var updatedData = {
+
+                Id: id,
+
+                Name: $('#Fullname').val(),
+
+                gender: $('input[name="e.newGender"]:checked').val(),
+
+                department: $('#Department').val(),
+
+                gob_description: $('#Gob_description').val(),
+
+                startShift: $('#newStartShift').val(),
+
+                endShift: $('#newEndShift').val()
+            };
+
+
+            console.log("Update data:", updatedData);
+
+
+            $.ajax({
+
+                url: '?handler=Update',
+
+                method: 'POST',
+
+                contentType: 'application/json',
+
+                data: JSON.stringify(updatedData),
+
+                success: function (response) {
+
+                    console.log("Update response:", response);
+
+                    if (response.success) {
+
+                        $('#message')
+                            .text('Employee updated successfully')
+                            .css('color', 'green');
+
+                        window.location.href = '/employees/list';
+
+                    } else {
+
+                        $('#message')
+                            .text(response.message || 'Failed to update employee')
+                            .css('color', 'red');
+                    }
+                },
+
+                error: function (xhr, status, error) {
+
+                    console.log("Update error:", xhr.responseText);
+
+                    $('#message')
+                        .text('An error occurred: ' + error)
+                        .css('color', 'red');
+                }
+            });
+
+        });
+
+
+        // =========================================================
+        // 7. OPEN ADD EMPLOYEE MODAL
+        // =========================================================
+
+        $('#exampleModal').on('shown.bs.modal', function () {
+
+            loadJobs();
+
+        });
+
+
+        // =========================================================
+        // 8. LOAD JOBS INTO DROPDOWN
+        // =========================================================
+
+        function loadJobs() {
+
+            $.ajax({
+
+                url: '?handler=JobResult',
+
+                type: 'GET',
+
+                success: function (jobs) {
+
+                    console.log("Jobs received:", jobs);
+
+
+                    var jobSelect = $('#jobSelect');
+
+
+                    // Remove old options
+                    jobSelect.empty();
+
+
+                    // Add default option
+                    jobSelect.append(
+                        '<option value="">Select a job</option>'
+                    );
+
+
+                    // Add jobs
+                    $.each(jobs, function (index, job) {
+
+                        jobSelect.append(
+
+                            '<option value="' +
+                            job.id +
+                            '">' +
+                            job.name +
+                            '</option>'
+
+                        );
+
+                    });
+
+                },
+
+                error: function (xhr, status, error) {
+
+                    console.log("Job loading error:", xhr.responseText);
+
+                    alert('Error loading jobs');
+                }
+            });
+        }
+
+
+        // =========================================================
+        // 9. SAVE NEW EMPLOYEE
+        // =========================================================
+
+        $('#save').click(function (event) {
+
+            event.preventDefault();
+
+
+            var datatosend = {
+
+                Name: $('#fullname').val(),
+
+                gender: $('input[name="e.gender"]:checked').val(),
+
+                department: $('#department').val(),
+
+                JobId: parseInt($('#jobSelect').val()),
+
+                startShift: $('#startShift').val(),
+
+                endShift: $('#endShift').val()
+            };
+
+
+            console.log("Employee data being sent:");
+
+            console.log(datatosend);
+
+
+            // Make sure a job was selected
+            if (!datatosend.JobId || isNaN(datatosend.JobId)) {
+
+                $('#message')
+                    .text('Please select a job')
+                    .css('color', 'red');
+
+                return;
+            }
+
+
+            // Send employee to backend
+            $.ajax({
+
+                url: '?handler=Employee',
+
+                method: 'POST',
+
+                contentType: 'application/json',
+
+                data: JSON.stringify(datatosend),
+
+
+                success: function (response) {
+
+                    console.log("Save response:", response);
+
+
+                    if (response.success) {
+
+                        $('#message')
+                            .text('Employee has been created successfully')
+                            .css('color', 'green');
+
+
+                        window.location.href = '/employees/list';
+
+                    } else {
+
+                        $('#message')
+                            .text(response.message || 'Failed to create employee')
+                            .css('color', 'red');
+                    }
+                },
+
+
+                error: function (xhr, status, error) {
+
+                    console.log("Save error status:", status);
+
+                    console.log("Save error:", error);
+
+                    console.log("Server response:", xhr.responseText);
+
+
+                    $('#message')
+                        .text('An error occurred: ' + error)
+                        .css('color', 'red');
+                }
+            });
+
+        });
+
+    });
+
+    </script>
+
+

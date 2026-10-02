@@ -1,0 +1,78 @@
+﻿@page "{id:int}"
+@model Razor2web.Pages.employees.editModel
+@{
+}
+<div>
+    <div class="mb-3">
+        <label for="Name">Full Name</label>
+        <input type="text" class="form-control" id="fullname" name="Employee.Name" value="@Model.Employee.Name" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="gender">Gender</label>
+        <input type="radio" name="Employee.gender" value="male" @(Model.Employee.gender == "male" ? "checked" : "") /> Male
+        <input type="radio" name="Employee.gender" value="female" @(Model.Employee.gender == "female" ? "checked" : "") /> Female
+    </div>
+
+    <div class="mb-3">
+        <label for="gob_description">Job Description</label>
+        <input type="text" class="form-control" id="gob_description" name="Employee.gob_description" value="@Model.Employee.gob_description" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="department">Department</label>
+        <input type="text" class="form-control" id="department" name="Employee.department" value="@Model.Employee.department" required />
+    </div>
+
+    <div class="mb-3">
+        <label>start work at</label>
+        <input type="time" class="form-control" id="startShift" name="Employee.startShift" value="@Model.Employee.startShift" required/>
+    </div>
+
+    <div class="mb-3">
+        <label>end work at</label>
+        <input type="time" class="form-control" id="endShift" name="Employee.endShift" value="@Model.Employee.endShift" required/>
+    </div>
+
+    <!-- Make sure this is a regular submit button -->
+    <button type="submit" class="btn btn-primary" id="update">Save Changes</button>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#update').click(function () {
+            var id = @Model.Employee.Id; // Add this to fetch the employee's ID
+            var datatosend = {
+                Id: id,
+                Name: $('#fullname').val(),
+                gender: $('input[name="Employee.gender"]:checked').val(),
+                department: $('#department').val(),
+                gob_description: $('#gob_description').val(),
+                startShift: $('#startShift').val(),
+                endShift: $('#endShift').val()
+            };
+           
+            // return;     
+            $.ajax({
+                url: '?handler=Update',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(datatosend),
+                success: function (response) {
+                    console.log(response);
+                    if (response.success) {
+                        $('#message').text('Employee has been updated successfully').css('color', 'green');
+                        window.location.href = '/employees/list'
+                    } else {
+                        $('#message').text('Failed to update employee').css('color', 'red');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log('error');
+                    $('#message').text('An error occurred: ' + error).css('color', 'red');
+                }
+            });
+        });
+    });
+</script>

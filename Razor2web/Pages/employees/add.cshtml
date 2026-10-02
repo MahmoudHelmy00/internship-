@@ -1,0 +1,73 @@
+﻿@page
+@model Razor2web.Pages.employees.addModel
+@{
+    var message = ViewData["message"]?.ToString();
+}
+<form class="mb-3" method="post">
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <div class="alert alert-success">
+            @message
+        </div>
+    }
+    <div class="mb-3">
+        <label>full name</label>
+        <input type="text" class="form-control" required asp-for="e.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label>gender</label>
+        <input type="radio" name="e.gender" value="male" asp-for="e.gender" id="male"/><label for=" male">male</label>
+        <input type="radio" name="e.gender" value="female" asp-for="e.gender" id="femal" /><label for="femal">female</label>
+    </div>
+
+    <div class="mb-3">
+        <label> gob_description</label>
+        <input type="text" class="form-control" required asp-for="e.gob_description"/>
+    </div>
+
+    <div class="mb-3">
+        <label> department</label>
+        <input type="text" class="form-control" required asp-for="e.department"/>
+    </div>
+
+    <div class="mb-3">
+        <label>start work at</label>
+        <input type="time" class="form-control"required/ asp-for="e.startShift">
+    </div>
+
+    <div class="mb-3">
+        <label>end work at</label>
+        <input type="time" class="form-control" required  asp-for="e.endShift"/>
+    </div>
+
+    
+
+    <button class="btn btn-primary" id="save">save</button>
+</form>
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            $("#save").click(function () {
+                $.ajax({
+                    url: '@Url.Page("add", "OnPost")',
+                    type: 'POST',
+                    data: JSON.stringify({ Employee: formData }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            $('#message').text(response.message).css('color', 'green');
+                        } else {
+                            $('#message').text(response.message).css('color', 'red');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $('#message').text('An error occurred: ' + error).css('color', 'red');
+                    }
+                })
+            
+        });
+    </script>
+}

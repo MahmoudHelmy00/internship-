@@ -1,0 +1,15 @@
+﻿@page
+@model Razor2web.Pages.jobs.jobModel
+
+<h1>job Details</h1>
+
+@if (Model.job != null)
+{
+    <div>
+        <p><strong>ID:</strong> @Model.job.Id</p>
+        <p><strong>Title:</strong> @Model.job.Name</p>
+        <p><strong>Description:</strong> @Model.job.Description</p>
+        <p><strong>Department:</strong> @Model.job.department</p>
+        <p><strong>Salary:</strong> @Model.job.salary</p>
+    </div>
+}
